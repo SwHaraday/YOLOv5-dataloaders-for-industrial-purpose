@@ -1,6 +1,9 @@
 # YOLOv5 🚀 by Ultralytics, AGPL-3.0 license
 """
 Dataloaders and dataset utils
+グランドトゥルースボックスが分断されないようにclass LoadImagesAndLabelsに
+def random_crop_keepGTB()を追加して、copy_pasteとrandom_perspectiveの代わりに実行する
+ように改造してある。オリジナルはdataloaders_org.pyと改名して保存済み。　20240229 原田
 """
 
 import contextlib
@@ -768,7 +771,7 @@ class LoadImagesAndLabels(Dataset):
         while any(flag):
             flag = [True] * n
             i = 0
-            left = random.randint(0, 639)
+            left = random.randint(0, self.img_size - 1)
             right = left + (w0 // 2)
             for label in labels:
                 if label[1] <= left <= label[3] or label[1] <= right <= label[3]:
@@ -781,7 +784,7 @@ class LoadImagesAndLabels(Dataset):
         while any(flag):
             flag = [True] * n
             i = 0
-            top = random.randint(0, 639)
+            top = random.randint(0, self.img_size - 1)
             bottom = top + (w0 // 2)
             for label in labels:
                 if label[2] <= top <= label[4] or label[2] <= bottom <= label[4]:
