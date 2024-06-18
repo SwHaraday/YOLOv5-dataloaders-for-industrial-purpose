@@ -770,28 +770,24 @@ class LoadImagesAndLabels(Dataset):
         flag = [True] * n        
         while any(flag):
             flag = [True] * n
-            i = 0
             left = random.randint(0, self.img_size - 1)
             right = left + (w0 // 2)
-            for label in labels:
+            for i, label in enumerate(labels):
                 if label[1] <= left <= label[3] or label[1] <= right <= label[3]:
                     flag[i] = True
                 else:
                     flag[i] = False
-                i += 1
         # h方向のクロップ範囲を決める
         flag = [True] * n
         while any(flag):
             flag = [True] * n
-            i = 0
             top = random.randint(0, self.img_size - 1)
             bottom = top + (w0 // 2)
-            for label in labels:
+            for i, label in enumerate(labels):
                 if label[2] <= top <= label[4] or label[2] <= bottom <= label[4]:
                     flag[i] = True
                 else:
                     flag[i] = False
-                i += 1
         # スライスで画像をクロップ
         im = im[top:bottom, left:right]
     
