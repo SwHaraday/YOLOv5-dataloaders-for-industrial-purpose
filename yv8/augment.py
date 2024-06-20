@@ -333,19 +333,19 @@ class Mosaic(BaseMixTransform):
         final_labels["cls"] = final_labels["cls"][good]
         return final_labels
 
-class keepGTB(BaseMixTransform):
+class keepGTB:
     '''
     YOLOv8以降でmosaic4処理後にモザイク後に組み合わせた4画像中のGTBを保持するようにクロップする機能
     '''
-    def __init__(self, imgsz):
-        self.img_size = 640
+    def __init__(self, imgsz=640):
+        self.img_size = imgsz
 
     def __call__(self, labels):
         # 構造化されたlabelsから必要な中身を取り出す
         im = labels["img"]
         labelset = labels["instances"].bboxes
         cls = labels["cls"]
-        h0, w0, c = im.shape
+        #h0, w0, c = im.shape
         n = len(labelset)
         # 空リストの準備
         ll = [] # テンポラリのラベル用空リスト
@@ -357,7 +357,7 @@ class keepGTB(BaseMixTransform):
             while any(flag):
                 flag = [True] * n
                 left = random.randint(0, self.img_size - 1)
-                right = left + (w0 // 2)
+                right = left + (self.img_size)
                 for i, label in enumerate(labelset):
                     if float(label[0]) <= left <= float(label[2]) or float(label[0]) <= right <= float(label[2]):
                         flag[i] = True
@@ -368,7 +368,7 @@ class keepGTB(BaseMixTransform):
             while any(flag):
                 flag = [True] * n
                 top = random.randint(0, self.img_size - 1)
-                bottom = top + (h0 // 2)
+                bottom = top + (self.img_size)
                 for i, label in enumerate(labelset):
                     if float(label[1]) <= top <= float(label[3]) or float(label[1]) <= bottom <= float(label[3]):
                         flag[i] = True
@@ -398,7 +398,7 @@ class keepGTB(BaseMixTransform):
             無理やり左上の640×640（要するにモザイクなしと同じ）を学習データとすることでエラーやstackを回避する　YH
             '''
             if cnt > 10000:
-                top, left, bottom, right = 0, 0, 640, 640
+                top, left, bottom, right = 0, 0, self.img_size, self.img_size
                 img = im[top:bottom, left:right]
                 for i, label in enumerate(labelset):
                     if float(label[2]) <= left or float(label[0]) >= right or float(label[3]) <= top or float(label[1]) >= bottom:
@@ -1072,7 +1072,7 @@ def v8_transforms(dataset, imgsz, hyp, stretch=False):
         pre_transform = Compose(
             [
                 Mosaic(dataset, imgsz=imgsz, p=hyp.mosaic, kgtb=hyp.kgtb),
-                keepGTB(dataset),
+                keepGTB(imgsz=imgsz),
             ]
         )
     else:

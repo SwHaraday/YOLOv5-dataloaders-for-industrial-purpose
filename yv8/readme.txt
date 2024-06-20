@@ -21,7 +21,6 @@ Usage:
 yolo detect train data=hoge.yaml model=yolov8n.pt epochs=100 batch=16 device=0 kgtb=True
 
 You can perform original training, unless 'kgtb=True' option is used.
-Only 640*640 training w/kGTB is available at this moment.
 
 **important notice**
 YOLOv8 does not allow to use training image with no bboxes.
